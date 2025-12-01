@@ -1,5 +1,4 @@
 import { router, protectedProcedure } from "../trpc";
-import { db } from "@/db";
 import { users } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { currentUser } from "@clerk/nextjs/server";

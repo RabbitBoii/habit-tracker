@@ -23,7 +23,7 @@ export const projectRouter = router({
 
     // 2. CREATE PROJECT
     create: protectedProcedure
-        .input(z.object({ name: z.string().min(1), color: z.string().optional() }))
+        .input(z.object({ name: z.string().min(1), description: z.string().optional(), color: z.string().optional() }))
         .mutation(async ({ ctx, input }) => {
             // A. Get the real user ID
             const user = await ctx.db.query.users.findFirst({
@@ -36,6 +36,7 @@ export const projectRouter = router({
             const [newProject] = await ctx.db.insert(projects).values({
                 userId: user.id,
                 name: input.name,
+                description: input.description,
                 colorCode: input.color || "#000000",
             }).returning();
 
