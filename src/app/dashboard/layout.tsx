@@ -1,41 +1,67 @@
+"use client";
+
 import { UserButton } from "@clerk/nextjs";
 import Link from "next/link";
+import { ModeToggle } from "@/components/mode-toggle";
+import { LayoutDashboard } from "lucide-react";
+import { trpc } from "@/app/_trpc/client";
 
 export default function DashboardLayout({
     children,
 }: {
     children: React.ReactNode;
 }) {
+    const { data: user } = trpc.user.getMe.useQuery();
     return (
-        <div className="flex h-screen bg-gray-50">
+        <div className="flex h-screen bg-muted/40">
             {/* SIDEBAR */}
-            <aside className="w-64 bg-white border-r hidden md:flex flex-col">
-                <div className="p-6 h-16 border-b flex items-center">
-                    <h1 className="text-xl font-bold tracking-tight">🚀 Habit<span className="text-blue-600">AI</span></h1>
+            <aside className="w-64 bg-background border-r hidden md:flex flex-col">
+                <div className="p-6 h-16 border-b flex items-center gap-2">
+                    {/* LOGO FIXED: Uses standard text colors */}
+                    <LayoutDashboard className="w-6 h-6 text-primary" />
+                    <Link href="/">
+                        <span className="text-xl font-bold tracking-tight text-foreground">
+                            Habit<span className="text-primary">AI</span>
+                        </span>
+                    </Link>
                 </div>
 
                 <nav className="flex-1 p-4 space-y-2">
-                    <Link href="/dashboard" className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md">
+                    <Link href="/dashboard" className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-primary bg-muted rounded-md transition-colors">
                         📂 Projects
                     </Link>
-                    <div className="text-xs font-semibold text-gray-400 mt-6 mb-2 px-4 uppercase">
-                        Account
-                    </div>
-                    <div className="px-4 text-sm text-gray-600">
-                        {/* We will add credit count here later */}
-                        Credits: ...
-                    </div>
+                    {/* You can add more links here later */}
                 </nav>
 
-                <div className="p-4 border-t">
-                    <UserButton showName />
+                {/* Credit count moved to bottom of sidebar */}
+                <div className="p-4 border-t text-sm text-muted-foreground flex justify-between items-center">
+                    <span>Credits:</span>
+                    <span className="font-bold text-primary">{user?.credits ?? " - "}</span>
                 </div>
             </aside>
 
-            {/* MAIN CONTENT */}
-            <main className="flex-1 overflow-y-auto">
-                {children}
-            </main>
+            {/* MAIN CONTENT AREA */}
+            <div className="flex-1 flex flex-col">
+                {/* NEW TOP HEADER */}
+                <header className="h-16 border-b bg-background flex items-center px-6 justify-between">
+                    {/* Title or Breadcrumb (Optional) */}
+                    <h1 className="text-lg font-semibold md:hidden">HabitAI</h1>
+                    <div className="hidden md:block text-muted-foreground text-sm">
+                        Dashboard &gt; Overview
+                    </div>
+
+                    {/* RIGHT SIDE ACTIONS */}
+                    <div className="flex items-center gap-4">
+                        <ModeToggle />
+                        <UserButton />
+                    </div>
+                </header>
+
+                {/* PAGE CONTENT */}
+                <main className="flex-1 overflow-y-auto p-8">
+                    {children}
+                </main>
+            </div>
         </div>
     );
-}   
+}

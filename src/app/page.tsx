@@ -1,49 +1,93 @@
-"use client";
+import Link from "next/link";
+import { ModeToggle } from "@/components/mode-toggle";
+import { Button } from "@/components/ui/button";
+import { ArrowRight, LayoutDashboard } from "lucide-react";
+import { SignedIn, SignedOut, SignInButton, SignUpButton, UserButton } from "@clerk/nextjs";
 
-import { trpc } from "@/app/_trpc/client";
-import { SignInButton, SignedIn, SignedOut, UserButton } from "@clerk/nextjs";
-
-export default function Home() {
-  // This hook will fail if you aren't logged in, that's expected!
-  const { data: user, isLoading } = trpc.user.getMe.useQuery();
-
+export default function LandingPage() {
   return (
-    <div className="flex flex-col items-center justify-center h-screen gap-6 bg-gray-100">
-      <h1 className="text-4xl font-bold">Frontend Bridge 🌉</h1>
-
-      {/* SHOW THIS IF LOGGED OUT */}
-      <SignedOut>
-        <div className="p-6 bg-white rounded-lg shadow-md text-center">
-          <p className="mb-4 text-lg">You are strictly logged out!</p>
-          <SignInButton mode="modal">
-            <button className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition">
-              Sign In with Clerk
-            </button>
-          </SignInButton>
+    <div className="flex flex-col min-h-screen bg-background">
+      {/* HEADER */}
+      <header className="px-4 lg:px-6 h-14 flex items-center border-b sticky top-0 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 z-50">
+        <div className="p-6 h-16 flex items-center gap-2">
+          <LayoutDashboard className="w-6 h-6 text-primary" />
+          <Link className="flex items-center justify-center" href="#">
+            <span className="font-bold text-xl">Habit<span className="text-primary">AI</span></span>
+          </Link>
         </div>
-      </SignedOut>
+        <nav className="ml-auto flex gap-4 sm:gap-6 items-center">
+          <Link className="text-sm font-medium hover:underline underline-offset-4" href="/features">
+            Features
+          </Link>
+          <Link className="text-sm font-medium hover:underline underline-offset-4" href="#pricing">
+            Pricing
+          </Link>
+          {/* THEME TOGGLE */}
+          <ModeToggle />
+          {/* CLERK BUTTONS WILL GO HERE AUTOMATICALLY ON DASHBOARD */}
 
-      {/* SHOW THIS IF LOGGED IN */}
-      <SignedIn>
-        <div className="flex flex-col items-center gap-4">
-          <UserButton />
 
-          <div className="p-6 bg-white border rounded-lg shadow-md w-96">
-            <h2 className="text-xl font-semibold text-slate-600 mb-4">User Data from DB:</h2>
-            {isLoading ? (
-              <p>Loading...</p>
-            ) : (
-              <pre className="p-4 bg-gray-800 text-green-400 rounded-md text-sm overflow-auto">
-                {JSON.stringify(user, null, 2)}
-              </pre>
-            )}
+          <SignedOut>
+            <SignInButton mode="modal">
+              <Button variant="ghost" size="sm">Log In</Button>
+            </SignInButton>
+          </SignedOut>
+          <SignedIn>
+            <UserButton />
+          </SignedIn>
+        </nav>
+      </header>
+
+      {/* HERO SECTION */}
+      <main className="flex-1">
+        <section className="w-full py-12 md:py-24 lg:py-32 xl:py-48 flex flex-col items-center text-center">
+          <div className="container px-4 md:px-6">
+            <div className="flex flex-col items-center space-y-4 text-center">
+              <div className="space-y-2">
+                <h1 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl lg:text-6xl/none">
+                  Crush Your Goals with <span className="text-primary">AI-Powered</span> Habits
+                </h1>
+                <p className="mx-auto max-w-[700px] text-gray-500 md:text-xl dark:text-gray-400">
+                  Stop planning and start doing. Let our AI break down your ambitious projects into bite-sized, actionable tasks.
+                </p>
+              </div>
+
+
+              <div className="space-x-4">
+
+                <SignedOut>
+                  <SignUpButton>
+                    <Button className="px-8" size="lg">
+                      Get Started <ArrowRight className="ml-2 h-4 w-4" />
+                    </Button>
+                  </SignUpButton>
+                </SignedOut>
+
+
+                <SignedIn>
+                  <Link href='/dashboard'>
+                    <Button className="px-8" size='lg'>
+                      Go to Dashboard <ArrowRight className="ml-2 h-2 w-4" />
+                    </Button>
+                  </Link>
+                </SignedIn>
+
+                <Button variant="outline" size="lg">
+                  Learn More
+                </Button>
+
+              </div>
+            </div>
           </div>
+        </section>
+      </main>
 
-          <p className="text-gray-600 font-medium">
-            Credits: {user?.credits ?? 0}
-          </p>
-        </div>
-      </SignedIn>
+      {/* FOOTER */}
+      <footer className="flex flex-col gap-2 sm:flex-row py-6 w-full shrink-0 items-center px-4 md:px-6 border-t">
+        <p className="text-xs text-gray-500 dark:text-gray-400">
+          © 2025 HabitAI. All rights reserved.
+        </p>
+      </footer>
     </div>
   );
 }

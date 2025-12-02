@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { router, protectedProcedure } from "../trpc";
 import { tasks, users, priorityEnum, statusEnum } from "@/db/schema"; // Import enums!
-import { eq, asc } from "drizzle-orm";
+import { eq, and, asc, desc } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
 
 export const taskRouter = router({
@@ -29,18 +29,70 @@ export const taskRouter = router({
 
             if (!user) throw new TRPCError({ code: "UNAUTHORIZED" });
 
-            // Find the last position so we can append to the bottom
-            // (Optional optimization: Just set to 0 and let user drag it)
+            const lastTask = await ctx.db.query.tasks.findFirst({
+                where: eq(tasks.projectId, input.projectId),
+                orderBy: [desc(tasks.position)],
+            });
+
+            const newPosition = lastTask ? lastTask.position + 1 : 0;
 
             await ctx.db.insert(tasks).values({
                 userId: user.id,
                 projectId: input.projectId,
                 title: input.title,
                 priority: input.priority || "medium",
-                position: 9999, // Put it at the end for now
+                position: newPosition,
             });
+            return { success: true };
+        }),
+    delete: protectedProcedure
+        .input(z.object({ taskId: z.number() }))
+        .mutation(async ({ ctx, input }) => {
+            const user = await ctx.db.query.users.findFirst({
+                where: eq(users.clerkId, ctx.session.userId),
+            });
+            if (!user) throw new TRPCError({ code: "UNAUTHORIZED" });
+
+            // We use 'and()' to ensure we only delete if it belongs to THIS user
+            const deleted = await ctx.db.delete(tasks)
+                .where(and(
+                    eq(tasks.id, input.taskId),
+                    eq(tasks.userId, user.id)
+                ))
+                .returning();
+
+            if (!deleted.length) throw new TRPCError({ code: "NOT_FOUND" });
 
             return { success: true };
+        }),
+
+    update: protectedProcedure
+        .input(z.object({
+            taskId: z.number(),
+            title: z.string().min(1).optional(),
+            priority: z.enum(["low", "medium", "high"]).optional()
+        }))
+        .mutation(async ({ ctx, input }) => {
+            const user = await ctx.db.query.users.findFirst({
+                where: eq(users.clerkId, ctx.session.userId),
+            });
+            if (!user) throw new TRPCError({ code: "UNAUTHORIZED" });
+
+            const [updatedTask] = await ctx.db.update(tasks)
+                .set({
+                    // Only update fields that were provided
+                    ...(input.title ? { title: input.title } : {}),
+                    ...(input.priority ? { priority: input.priority } : {})
+                })
+                .where(and(
+                    eq(tasks.id, input.taskId),
+                    eq(tasks.userId, user.id)
+                ))
+                .returning();
+
+            if (!updatedTask) throw new TRPCError({ code: "NOT_FOUND" });
+
+            return updatedTask;
         }),
 
     // 3. UPDATE STATUS (Todo -> Done)

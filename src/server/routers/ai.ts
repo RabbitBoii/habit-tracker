@@ -44,7 +44,7 @@ export const aiRouter = router({
             // 3. Call the AI
             const completion = await groq.chat.completions.create({
                 messages: [{ role: "user", content: prompt }],
-                model: "llama3-8b-8192", // Fast and cheap model
+                model: "llama-3.3-70b-versatile", // Fast and cheap model
                 response_format: { type: "json_object" }, // Force JSON mode
             });
 
