@@ -4,14 +4,13 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { useRouter } from "next/navigation";
 import { trpc } from "@/app/_trpc/client";
-import { toast } from "sonner"; 
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 import {
     Dialog,
     DialogContent,
-    DialogDescription,
     DialogHeader,
     DialogTitle,
     DialogTrigger,
@@ -24,49 +23,51 @@ import {
     FormLabel,
     FormMessage,
 } from "@/components/ui/form";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
 import { Plus } from "lucide-react";
 
-// 1. Define the Form Schema (Validation)
 const formSchema = z.object({
-    name: z.string().min(1, "Project name is required"),
-    description: z.string().optional(),
+    title: z.string().min(1, "Title is required"),
+    priority: z.enum(["low", "medium", "high"]),
 });
 
-export default function CreateProjectBtn() {
-    const router = useRouter();
+export default function AddTaskBtn({ projectId }: { projectId: number }) {
     const [open, setOpen] = useState(false);
+    const router = useRouter();
 
-    // 2. Setup the Form
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {
-            name: "",
-            description: "",
+            title: "",
+            priority: "medium",
         },
     });
 
-    // 3. Setup the Backend Mutation
-    const createProject = trpc.project.create.useMutation({
-        onSuccess: (project) => {
-            toast.success(`Project "${project.name}" created!`);
+    const utils = trpc.useUtils(); // We use this to refresh the list without reloading page
+
+    const createTask = trpc.task.create.useMutation({
+        onSuccess: () => {
+            toast.success("Task added!");
             setOpen(false);
             form.reset();
-            // Redirect to the new project page immediately
-            router.push(`/dashboard/project/${project.id}`);
+            utils.task.getByProject.invalidate({ projectId }); // Refresh the list instantly
         },
-        onError: (err) => {
-            toast.error("Failed to create project: " + err.message);
-        },
+        onError: (err) => toast.error(err.message),
     });
 
     function onSubmit(values: z.infer<typeof formSchema>) {
-        createProject.mutate({
-            name: values.name,
-            description: values.description,
-            color: "#3b82f6", // Default blue for now
+        createTask.mutate({
+            projectId,
+            title: values.title,
+            priority: values.priority,
         });
     }
 
@@ -74,48 +75,48 @@ export default function CreateProjectBtn() {
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
                 <Button>
-                    <Plus className="mr-2 h-4 w-4" /> New Project
+                    <Plus className="mr-2 h-4 w-4" /> Add Task
                 </Button>
             </DialogTrigger>
             <DialogContent className="sm:max-w-[425px]">
                 <DialogHeader>
-                    <DialogTitle>Create Project</DialogTitle>
-                    <DialogDescription>
-                        Add a new goal. We'll use AI to break it down later.
-                    </DialogDescription>
+                    <DialogTitle>Add New Task</DialogTitle>
                 </DialogHeader>
 
                 <Form {...form}>
                     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-
-                        {/* NAME INPUT */}
                         <FormField
                             control={form.control}
-                            name="name"
+                            name="title"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>Project Name</FormLabel>
+                                    <FormLabel>Task Title</FormLabel>
                                     <FormControl>
-                                        <Input placeholder="Learn Guitar, Build App..." {...field} />
+                                        <Input placeholder="Buy milk..." {...field} />
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>
                             )}
                         />
 
-                        {/* DESCRIPTION INPUT */}
                         <FormField
                             control={form.control}
-                            name="description"
+                            name="priority"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>Description (Optional)</FormLabel>
-                                    <FormControl>
-                                        <Textarea
-                                            placeholder="I want to learn acoustic guitar in 30 days..."
-                                            {...field}
-                                        />
-                                    </FormControl>
+                                    <FormLabel>Priority</FormLabel>
+                                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                        <FormControl>
+                                            <SelectTrigger>
+                                                <SelectValue placeholder="Select priority" />
+                                            </SelectTrigger>
+                                        </FormControl>
+                                        <SelectContent>
+                                            <SelectItem value="low">Low</SelectItem>
+                                            <SelectItem value="medium">Medium</SelectItem>
+                                            <SelectItem value="high">High</SelectItem>
+                                        </SelectContent>
+                                    </Select>
                                     <FormMessage />
                                 </FormItem>
                             )}
@@ -125,8 +126,8 @@ export default function CreateProjectBtn() {
                             <Button type="button" variant="ghost" onClick={() => setOpen(false)}>
                                 Cancel
                             </Button>
-                            <Button type="submit" disabled={createProject.isPending}>
-                                {createProject.isPending ? "Creating..." : "Create"}
+                            <Button type="submit" disabled={createTask.isPending}>
+                                Add
                             </Button>
                         </div>
                     </form>

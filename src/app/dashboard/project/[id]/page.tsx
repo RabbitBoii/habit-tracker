@@ -8,6 +8,11 @@ import { ArrowLeft, Sparkles, Trash2, Plus } from "lucide-react";
 import Link from "next/link";
 import { toast } from "sonner";
 import EditProjectBtn from "@/components/dashboard/edit-project-btn";
+// import TaskActions from "@/components/dashboard/task-actions";
+import AddTaskBtn from "@/components/dashboard/add-task-btn";
+import { TaskCard } from "@/components/dashboard/task-card";
+import { DndContext, closestCenter, DragEndEvent } from "@dnd-kit/core";
+import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
 
 export default function ProjectDetailsPage() {
     const { id } = useParams();
@@ -27,6 +32,16 @@ export default function ProjectDetailsPage() {
         { enabled: !!projectId }
     );
 
+    // Stub function for now - we will add backend logic next!
+    function handleDragEnd(event: DragEndEvent) {
+        const { active, over } = event;
+        if (!over) return;
+
+        if (active.id !== over.id) {
+            console.log("Moved task", active.id, "to position", over.id);
+            // We will add the reorder logic here in the next step
+        }
+    }
     // 2. Mutations (AI & Delete)
     const generateAI = trpc.ai.generateTasks.useMutation({
         onSuccess: (data) => {
@@ -42,6 +57,8 @@ export default function ProjectDetailsPage() {
             router.push("/dashboard");
         },
     });
+
+
 
     if (isProjectLoading || !project) {
         return <div className="p-8"><Skeleton className="h-12 w-1/3 mb-4" /><Skeleton className="h-64 w-full" /></div>;
@@ -69,9 +86,7 @@ export default function ProjectDetailsPage() {
                     <Button variant="outline" onClick={() => deleteProject.mutate({ projectId })}>
                         <Trash2 className="w-4 h-4 text-red-500" />
                     </Button>
-                    <Button>
-                        <Plus className="w-4 h-4 mr-2" /> Add Task
-                    </Button>
+                    <AddTaskBtn projectId={projectId} />
                 </div>
             </div>
 
@@ -98,19 +113,18 @@ export default function ProjectDetailsPage() {
 
             {/* TASK LIST (Placeholder for Drag & Drop) */}
             {tasks && tasks.length > 0 && (
-                <div className="grid gap-4">
-                    {tasks.map((task) => (
-                        <div key={task.id} className="p-4 border rounded-lg bg-card flex justify-between items-center shadow-sm">
-                            <div>
-                                <div className="font-medium">{task.title}</div>
-                                <div className="text-xs text-muted-foreground uppercase mt-1">{task.priority} Priority</div>
-                            </div>
-                            <div className={`text-xs px-2 py-1 rounded-full ${task.status === 'done' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600'}`}>
-                                {task.status}
-                            </div>
+                <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+                    <SortableContext
+                        items={tasks.map((t) => t.id)}
+                        strategy={verticalListSortingStrategy}
+                    >
+                        <div className="grid gap-3">
+                            {tasks.map((task) => (
+                                <TaskCard key={task.id} task={task} />
+                            ))}
                         </div>
-                    ))}
-                </div>
+                    </SortableContext>
+                </DndContext>
             )}
         </div>
     );
