@@ -13,10 +13,10 @@ export default function DashboardLayout({
 }) {
     const { data: user } = trpc.user.getMe.useQuery();
     return (
-        <div className="flex h-screen bg-muted/40 w-full overflow-hidden">
+        <div className="fixed inset-0 flex bg-muted/40 overflow-hidden">
             {/* SIDEBAR */}
             <aside className="w-64 bg-background border-r hidden md:flex flex-col shrink-0">
-                <div className="p-6 h-16 border-b flex items-center gap-2">
+                <div className="p-6 h-16 border-b flex items-center gap-2 shrink-0">
                     {/* LOGO FIXED: Uses standard text colors */}
                     <LayoutDashboard className="w-6 h-6 text-primary" />
                     <Link href="/">
@@ -34,16 +34,16 @@ export default function DashboardLayout({
                 </nav>
 
                 {/* Credit count moved to bottom of sidebar */}
-                <div className="p-4 border-t text-sm text-muted-foreground flex justify-between items-center">
+                <div className="p-4 border-t text-sm text-muted-foreground flex justify-between items-center shrink-0">
                     <span>Credits:</span>
                     <span className="font-bold text-primary">{user?.credits ?? " - "}</span>
                 </div>
             </aside>
 
             {/* MAIN CONTENT AREA */}
-            <div className="flex-1 flex flex-col h-auto min-h-0">
+            <div className="flex-1 flex flex-col min-w-0">
                 {/* NEW TOP HEADER */}
-                <header className="h-16 border-b bg-background flex items-center px-6 justify-between shrink-0">
+                <header className="h-16 border-b bg-background flex items-center px-6 justify-between shrink-0 z-10">
                     {/* Title or Breadcrumb (Optional) */}
                     <h1 className="text-lg font-semibold md:hidden">HabitAI</h1>
                     <div className="hidden md:block text-muted-foreground text-sm">
@@ -59,7 +59,9 @@ export default function DashboardLayout({
 
                 {/* PAGE CONTENT */}
                 <main className="flex-1 overflow-y-auto p-8 pb-32 scroll-smooth">
-                    {children}
+                    <div className="max-w-6xl mx-auto">
+                        {children}
+                    </div>
                 </main>
             </div>
         </div>
