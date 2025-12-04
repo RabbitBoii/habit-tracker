@@ -30,13 +30,14 @@ export const aiRouter = router({
         Strictly return a JSON OBJECT with a key "tasks" containing an array of objects.
         Each object must have:
         - "title" (string, max 60 chars)
+        - "description" (string, 1 short actionable sentence explaining what to do)
         - "priority" (string: "low", "medium", or "high")
         
         Example Output:
         {
           "tasks": [
-            { "title": "Install dependencies", "priority": "high" },
-            { "title": "Design database schema", "priority": "medium" }
+            { "title": "Install dependencies", "description": "Run npm install to set up the environment.", "priority": "high" },
+            { "title": "Design database schema", "description": "Define tables and relationships to structure your application data efficiently." ,"priority": "medium" }
           ]
         }
       `;
@@ -60,6 +61,7 @@ export const aiRouter = router({
                 const AiResponseSchema = z.object({
                     tasks: z.array(z.object({
                         title: z.string(),
+                        description: z.string().optional().default(""),
                         priority: z.enum(["low", "medium", "high"]).optional().default("medium"),
                     }))
                 });
@@ -72,6 +74,7 @@ export const aiRouter = router({
                     projectId: project.id,
                     userId: project.userId,
                     title: task.title,
+                    description: task.description, 
                     priority: task.priority,
                     position: index + 1, // Keep the AI's chronological order
                 }));

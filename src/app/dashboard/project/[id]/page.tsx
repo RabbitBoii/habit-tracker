@@ -15,6 +15,7 @@ import AddTaskBtn from "@/components/dashboard/add-task-btn";
 import { TaskCard } from "@/components/dashboard/task-card";
 import { DndContext, closestCenter, DragEndEvent } from "@dnd-kit/core";
 import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
+import ProjectStats from "@/components/dashboard/project-stats";
 
 export default function ProjectDetailsPage() {
     const { id } = useParams();
@@ -141,6 +142,9 @@ export default function ProjectDetailsPage() {
                         {generateAI.isPending ? "Generating Plan..." : "✨ Generate AI Plan (1 Credit)"}
                     </Button>
                 </div>
+            )}
+            {tasks && tasks.length > 0 && (
+                <ProjectStats tasks={tasks} />
             )}
 
             {/* TASK LIST (Placeholder for Drag & Drop) */}
