@@ -1,5 +1,7 @@
 "use client";
 
+import { useState, useEffect } from "react";
+import { arrayMove } from "@dnd-kit/sortable";
 import { trpc } from "@/app/_trpc/client";
 import { useParams, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
@@ -17,8 +19,6 @@ import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable"
 export default function ProjectDetailsPage() {
     const { id } = useParams();
     const router = useRouter();
-
-    // Convert String ID (from URL) to Number (for DB)
     const projectId = parseInt(id as string);
 
     // 1. Fetch Project & Tasks
@@ -27,26 +27,58 @@ export default function ProjectDetailsPage() {
         { enabled: !!projectId } // Only run if ID exists
     );
 
-    const { data: tasks, isLoading: isTasksLoading, refetch: refetchTasks } = trpc.task.getByProject.useQuery(
+    // const { data: tasks, isLoading: isTasksLoading, refetch: refetchTasks } = trpc.task.getByProject.useQuery(
+    //     { projectId },
+    //     { enabled: !!projectId }
+    // );
+    const { data: serverTasks, isLoading, refetch } = trpc.task.getByProject.useQuery(
         { projectId },
         { enabled: !!projectId }
     );
 
+    const [tasks, setTasks] = useState(serverTasks || []);
+
+    useEffect(() => {
+        if (serverTasks) {
+            setTasks(serverTasks);
+        }
+    }, [serverTasks]);
+
+    const saveOrder = trpc.task.saveOrder.useMutation({
+        onSuccess: () => {
+            // Optional: toast.success("Order saved");
+            // We don't need to refetch here because we already updated the UI locally!
+        },
+        onError: (err) => toast.error("Failed to save order: " + err.message)
+    });
+
     // Stub function for now - we will add backend logic next!
     function handleDragEnd(event: DragEndEvent) {
         const { active, over } = event;
-        if (!over) return;
+        if (!over || active.id === over.id) return;
 
-        if (active.id !== over.id) {
-            console.log("Moved task", active.id, "to position", over.id);
-            // We will add the reorder logic here in the next step
-        }
+        setTasks((currentTasks) => {
+            const oldIndex = currentTasks.findIndex((t) => t.id === active.id);
+            const newIndex = currentTasks.findIndex((t) => t.id === over.id);
+
+            // Create the new array
+            const newOrder = arrayMove(currentTasks, oldIndex, newIndex);
+
+            // 2. Send new ID order to Backend
+            // We map just the IDs because that's all the API needs
+            const orderIds = newOrder.map((t) => t.id);
+            saveOrder.mutate({ projectId, newOrder: orderIds });
+
+            return newOrder;
+        });
     }
+
+
     // 2. Mutations (AI & Delete)
     const generateAI = trpc.ai.generateTasks.useMutation({
         onSuccess: (data) => {
             toast.success(`Generated ${data.tasksGenerated} tasks!`);
-            refetchTasks(); // Refresh the list
+            refetch(); // Refresh the list
         },
         onError: (err) => toast.error(err.message),
     });

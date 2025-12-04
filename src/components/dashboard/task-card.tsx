@@ -44,7 +44,7 @@ export function TaskCard({ task }: TaskCardProps) {
     const getPriorityColor = (priority: string | null) => {
         if (priority === "high") return "text-red-500 font-bold";
         if (priority === "medium") return "text-yellow-600 font-medium";
-        return "text-gray-500 font-medium";
+        return "text-green-500 font-medium";
     };
 
     return (
@@ -70,8 +70,8 @@ export function TaskCard({ task }: TaskCardProps) {
                     )}
 
                     {/* Priority Label */}
-                    <div className="flex items-center justify-between mt-3 pt-2 border-t border-border/50">
-
+                    <div className="flex items-center justify-between mt-3 pt-2 ">
+                        {/* border-t border-border/50 */}
                         {/* Priority (Bottom Left) */}
                         <div className={cn("text-xs uppercase flex items-center gap-1", getPriorityColor(task.priority))}>
                             {task.priority || "Normal"}

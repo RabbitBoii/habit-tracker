@@ -33,9 +33,11 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
+import { Textarea } from "../ui/textarea";
 
 const formSchema = z.object({
     title: z.string().min(1, "Title is required"),
+    description: z.string().optional(),
     priority: z.enum(["low", "medium", "high"]),
 });
 
@@ -67,6 +69,7 @@ export default function AddTaskBtn({ projectId }: { projectId: number }) {
         createTask.mutate({
             projectId,
             title: values.title,
+            description: values.description,
             priority: values.priority,
         });
     }
@@ -93,6 +96,20 @@ export default function AddTaskBtn({ projectId }: { projectId: number }) {
                                     <FormLabel>Task Title</FormLabel>
                                     <FormControl>
                                         <Input placeholder="Buy milk..." {...field} />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+
+                        <FormField
+                            control={form.control}
+                            name="description"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Description</FormLabel>
+                                    <FormControl>
+                                        <Textarea placeholder="Details about the task..." {...field} />
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>

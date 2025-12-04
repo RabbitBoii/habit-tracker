@@ -23,6 +23,8 @@ import {
     DialogTitle,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "../ui/textarea";
+import { Label } from "@radix-ui/react-dropdown-menu";
 
 interface TaskActionsProps {
     task: {
@@ -38,6 +40,7 @@ interface TaskActionsProps {
 export default function TaskActions({ task }: TaskActionsProps) {
     const [isEditOpen, setIsEditOpen] = useState(false);
     const [editTitle, setEditTitle] = useState(task.title);
+    const [editDesc, setEditDesc] = useState(task.description || "")
 
     const utils = trpc.useUtils();
 
@@ -63,7 +66,8 @@ export default function TaskActions({ task }: TaskActionsProps) {
     });
 
     const handleUpdateTitle = () => {
-        updateTask.mutate({ taskId: task.id, title: editTitle });
+        updateTask.mutate({ taskId: task.id, title: editTitle, description: editDesc });
+
     };
 
     return (
@@ -133,12 +137,22 @@ export default function TaskActions({ task }: TaskActionsProps) {
                     <DialogHeader>
                         <DialogTitle>Edit Task</DialogTitle>
                     </DialogHeader>
-                    <div className="flex gap-2 py-4">
-                        <Input
-                            value={editTitle}
-                            onChange={(e) => setEditTitle(e.target.value)}
-                            placeholder="Task title"
-                        />
+                    <div className="flex flex-col gap-4 py-4">
+                        <div className="space-y-1">
+                            <Label>Title</Label>
+                            <Input
+                                value={editTitle}
+                                onChange={(e) => setEditTitle(e.target.value)}
+                            />
+                        </div>
+                        <div className="space-y-1">
+                            <Label>Description</Label>
+                            <Textarea
+                                value={editDesc}
+                                onChange={(e) => setEditDesc(e.target.value)}
+                                className="h-24"
+                            />
+                        </div>
                         <Button onClick={handleUpdateTitle} disabled={updateTask.isPending}>
                             Save
                         </Button>

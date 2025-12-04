@@ -20,6 +20,7 @@ export const taskRouter = router({
         .input(z.object({
             projectId: z.number(),
             title: z.string(),
+            description: z.string().optional(),
             priority: z.enum(["low", "medium", "high"]).optional()
         }))
         .mutation(async ({ ctx, input }) => {
@@ -40,11 +41,14 @@ export const taskRouter = router({
                 userId: user.id,
                 projectId: input.projectId,
                 title: input.title,
+                description: input.description,
                 priority: input.priority || "medium",
                 position: newPosition,
             });
             return { success: true };
         }),
+
+    // DELETE TASK
     delete: protectedProcedure
         .input(z.object({ taskId: z.number() }))
         .mutation(async ({ ctx, input }) => {
@@ -66,10 +70,12 @@ export const taskRouter = router({
             return { success: true };
         }),
 
+    // UPDATE TASK
     update: protectedProcedure
         .input(z.object({
             taskId: z.number(),
             title: z.string().min(1).optional(),
+            description: z.string().optional(),
             priority: z.enum(["low", "medium", "high"]).optional()
         }))
         .mutation(async ({ ctx, input }) => {
@@ -82,6 +88,7 @@ export const taskRouter = router({
                 .set({
                     // Only update fields that were provided
                     ...(input.title ? { title: input.title } : {}),
+                    ...(input.description ? { description: input.description } : {}),
                     ...(input.priority ? { priority: input.priority } : {})
                 })
                 .where(and(
@@ -94,8 +101,35 @@ export const taskRouter = router({
 
             return updatedTask;
         }),
+    // SAVE NEW ORDER (DRAG AND DROP)
+    saveOrder: protectedProcedure
+        .input(z.object({
+            projectId: z.number(),
+            newOrder: z.array(z.number()) // Array of Task IDs in the new order
+        }))
+        .mutation(async ({ ctx, input }) => {
+            const user = await ctx.db.query.users.findFirst({
+                where: eq(users.clerkId, ctx.session.userId),
+            });
+            if (!user) throw new TRPCError({ code: "UNAUTHORIZED" });
 
-    // 3. UPDATE STATUS (Todo -> Done)
+            // We use a Transaction to ensure all updates happen, or none do.
+            // This prevents the list from getting corrupted if the internet cuts out.
+            const updates = input.newOrder.map((taskId, index) => {
+                return ctx.db.update(tasks)
+                    .set({ position: index })
+                    .where(and(
+                        eq(tasks.id, taskId),
+                        eq(tasks.projectId, input.projectId)
+                    ));
+            });
+            await Promise.all(updates);
+
+            return { success: true };
+        }),
+
+
+    //  UPDATE STATUS 
     updateStatus: protectedProcedure
         .input(z.object({ taskId: z.number(), status: z.enum(["todo", "in_progress", "done"]) }))
         .mutation(async ({ ctx, input }) => {
