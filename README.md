@@ -1,36 +1,61 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🚀 HabitAI
 
-## Getting Started
+**A Full-Stack, AI-Powered Habit & Project Manager.**
+Stop planning and start doing. HabitAI uses **Llama 3.3** to break down your ambitious goals into actionable, bite-sized tasks automatically.
 
-First, run the development server:
+### [🔴 Live Demo](https://habit-tracker-rabbitboii-42.vercel.app/)
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+![Dashboard Preview](./public/Screenshot_landing.png)
+(./public/Screenshot_dashboard.png)
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## ✨ Key Features
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- **🧠 AI Project Breakdown:** Enter a goal (e.g., "Learn React"), and Llama 3.3 generates a structured plan with descriptions and priorities.
+- **⚡ Full-Stack Type Safety:** Built with **tRPC** for end-to-end type safety from database to UI.
+- **🖱️ Drag & Drop Kanban:** Organize tasks visually with optimistic UI updates (powered by `@dnd-kit`).
+- **📊 Visual Analytics:** Track progress with dynamic charts and statistics.
+- **🔐 Secure Authentication:** User management via **Clerk**.
+- **🎨 Modern UI:** Clean, responsive interface using **Shadcn/UI** and **Tailwind CSS** (with Dark Mode).
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 🛠️ Tech Stack
 
-## Learn More
+- **Framework:** Next.js 14 (App Router)
+- **Language:** TypeScript
+- **Database:** PostgreSQL (Neon.tech)
+- **ORM:** Drizzle ORM
+- **API:** tRPC (Serverless Functions)
+- **AI Model:** Llama 3.3 70B (via Groq)
+- **Auth:** Clerk
+- **Styling:** Tailwind CSS + Shadcn/UI
 
-To learn more about Next.js, take a look at the following resources:
+## 🚀 Getting Started Locally
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+1. **Clone the repository**
+   ```bash
+   git clone [https://github.com/yourusername/habit-ai.git](https://github.com/yourusername/habit-ai.git)
+   cd habit-ai
+   ```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+2. **Install dependencies**
+    ```bash
+    npm install
+    ```
 
-## Deploy on Vercel
+3. **Set up Environment Variables Create a `.env.local` file in the root and add your keys:**
+    ```bash
+    DATABASE_URL="postgres://..."
+    NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY="pk_test_..."
+    CLERK_SECRET_KEY="sk_test_..."
+    GROQ_API_KEY="gsk_..."
+    ```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+4. **Push Database Schema**
+    ```bash
+    npx drizzle-kit push
+    ```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+5. **Run the development server**
+    ```bash
+    npm run dev
+    ```
+
