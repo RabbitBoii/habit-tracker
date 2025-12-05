@@ -32,7 +32,7 @@ Stop planning and start doing. HabitAI uses **Llama 3.3** to break down your amb
 
 1. **Clone the repository**
    ```bash
-   git clone [https://github.com/yourusername/habit-ai.git](https://github.com/yourusername/habit-ai.git)
+   git clone [https://github.com/RabbitBoii/habit-tracker.git](https://github.com/RabbitBoii/habit-tracker.git)
    cd habit-ai
    ```
 
