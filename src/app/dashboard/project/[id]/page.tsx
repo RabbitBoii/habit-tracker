@@ -21,11 +21,12 @@ export default function ProjectDetailsPage() {
     const { id } = useParams();
     const router = useRouter();
     const projectId = parseInt(id as string);
+    const utils = trpc.useUtils();
 
-    // 1. Fetch Project & Tasks
+    // Fetch Project & Tasks
     const { data: project, isLoading: isProjectLoading } = trpc.project.getProject.useQuery(
         { id: projectId },
-        { enabled: !!projectId } // Only run if ID exists
+        { enabled: !!projectId }
     );
 
     // const { data: tasks, isLoading: isTasksLoading, refetch: refetchTasks } = trpc.task.getByProject.useQuery(
@@ -45,15 +46,17 @@ export default function ProjectDetailsPage() {
         }
     }, [serverTasks]);
 
+
+    // Save order of tasks upon drag and drop
     const saveOrder = trpc.task.saveOrder.useMutation({
         onSuccess: () => {
-            // Optional: toast.success("Order saved");
-            // We don't need to refetch here because we already updated the UI locally!
+            toast.success("Order saved");
         },
         onError: (err) => toast.error("Failed to save order: " + err.message)
     });
 
-    // Stub function for now - we will add backend logic next!
+
+    // Handles drag and drop
     function handleDragEnd(event: DragEndEvent) {
         const { active, over } = event;
         if (!over || active.id === over.id) return;
@@ -62,11 +65,8 @@ export default function ProjectDetailsPage() {
             const oldIndex = currentTasks.findIndex((t) => t.id === active.id);
             const newIndex = currentTasks.findIndex((t) => t.id === over.id);
 
-            // Create the new array
             const newOrder = arrayMove(currentTasks, oldIndex, newIndex);
 
-            // 2. Send new ID order to Backend
-            // We map just the IDs because that's all the API needs
             const orderIds = newOrder.map((t) => t.id);
             saveOrder.mutate({ projectId, newOrder: orderIds });
 
@@ -75,11 +75,12 @@ export default function ProjectDetailsPage() {
     }
 
 
-    // 2. Mutations (AI & Delete)
+    // Mutations (AI & Delete)
     const generateAI = trpc.ai.generateTasks.useMutation({
         onSuccess: (data) => {
             toast.success(`Generated ${data.tasksGenerated} tasks!`);
-            refetch(); // Refresh the list
+            refetch();
+            utils.user.getMe.invalidate();
         },
         onError: (err) => toast.error(err.message),
     });
@@ -123,7 +124,7 @@ export default function ProjectDetailsPage() {
                 </div>
             </div>
 
-            {/* AI GENERATION SECTION (Only show if 0 tasks) */}
+            {/* AI GENERATION SECTION */}
             {tasks?.length === 0 && (
                 <div className="border-2 border-dashed rounded-xl p-12 flex flex-col items-center justify-center text-center bg-muted/20">
                     <div className="h-16 w-16 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mb-6">
@@ -147,7 +148,7 @@ export default function ProjectDetailsPage() {
                 <ProjectStats tasks={tasks} />
             )}
 
-            {/* TASK LIST (Placeholder for Drag & Drop) */}
+            {/* TASK LIST */}
             {tasks && tasks.length > 0 && (
                 <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
                     <SortableContext

@@ -29,7 +29,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Plus } from "lucide-react";
 
-// 1. Define the Form Schema (Validation)
+// Define Form Schema 
 const formSchema = z.object({
     name: z.string().min(1, "Project name is required"),
     description: z.string().optional(),
@@ -39,7 +39,7 @@ export default function CreateProjectBtn() {
     const router = useRouter();
     const [open, setOpen] = useState(false);
 
-    // 2. Setup the Form
+    // Setup the Form
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {
@@ -48,7 +48,7 @@ export default function CreateProjectBtn() {
         },
     });
 
-    // 3. Setup the Backend Mutation
+    // Setup the Backend Mutation
     const createProject = trpc.project.create.useMutation({
         onSuccess: (project) => {
             toast.success(`Project "${project.name}" created!`);
@@ -66,7 +66,7 @@ export default function CreateProjectBtn() {
         createProject.mutate({
             name: values.name,
             description: values.description,
-            color: "#3b82f6", // Default blue for now
+            color: "#3b82f6",
         });
     }
 

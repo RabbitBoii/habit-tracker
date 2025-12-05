@@ -16,17 +16,15 @@ export default function LandingPage() {
           </Link>
         </div>
         <nav className="ml-auto flex gap-4 sm:gap-6 items-center">
-          <Link className="text-sm font-medium hover:underline underline-offset-4" href="/features">
+          <Link className="text-sm font-medium hover:underline underline-offset-4" href="#features">
             Features
           </Link>
           <Link className="text-sm font-medium hover:underline underline-offset-4" href="#pricing">
             Pricing
           </Link>
-          {/* THEME TOGGLE */}
           <ModeToggle />
-          {/* CLERK BUTTONS WILL GO HERE AUTOMATICALLY ON DASHBOARD */}
 
-
+          {/* Clerk Modal */}
           <SignedOut>
             <SignInButton mode="modal">
               <Button variant="ghost" size="sm">Log In</Button>
@@ -72,9 +70,11 @@ export default function LandingPage() {
                   </Link>
                 </SignedIn>
 
-                <Button variant="outline" size="lg">
-                  Learn More
-                </Button>
+                <Link href="https://github.com/RabbitBoii/habit-tracker">
+                  <Button variant="outline" size="lg">
+                    Learn More
+                  </Button>
+                </Link>
 
               </div>
             </div>

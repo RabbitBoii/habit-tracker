@@ -49,7 +49,6 @@ export default function EditProjectBtn({ project }: EditProjectBtnProps) {
 
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
-        // PRE-FILL DATA HERE 👇
         defaultValues: {
             name: project.name,
             description: project.description || "",
@@ -61,7 +60,7 @@ export default function EditProjectBtn({ project }: EditProjectBtnProps) {
         onSuccess: (data) => {
             toast.success(`Project updated!`);
             setOpen(false);
-            router.refresh(); // Refresh page to show new name
+            router.refresh();
         },
         onError: (err) => {
             toast.error("Failed to update: " + err.message);
@@ -73,7 +72,7 @@ export default function EditProjectBtn({ project }: EditProjectBtnProps) {
             id: project.id,
             name: values.name,
             description: values.description,
-            color: project.colorCode || "#000000", // Keep existing color or default
+            color: project.colorCode || "#000000",
         });
     }
 

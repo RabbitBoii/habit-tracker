@@ -53,14 +53,14 @@ export default function AddTaskBtn({ projectId }: { projectId: number }) {
         },
     });
 
-    const utils = trpc.useUtils(); // We use this to refresh the list without reloading page
+    const utils = trpc.useUtils(); 
 
     const createTask = trpc.task.create.useMutation({
         onSuccess: () => {
             toast.success("Task added!");
             setOpen(false);
             form.reset();
-            utils.task.getByProject.invalidate({ projectId }); // Refresh the list instantly
+            utils.task.getByProject.invalidate({ projectId }); 
         },
         onError: (err) => toast.error(err.message),
     });

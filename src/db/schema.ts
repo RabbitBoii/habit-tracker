@@ -30,12 +30,12 @@ export const projects = pgTable("projects", {
 
 export const tasks = pgTable("tasks", {
     id: serial("id").primaryKey(),
-    userId: integer("user_id").notNull().references(() => users.id, { onDelete: "cascade" }), // This will match Clerk ID
+    userId: integer("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
     projectId: integer("project_id").notNull().references(() => projects.id, { onDelete: "cascade" }),
     title: text("title").notNull(),
     description: text("description"),
     dueDate: timestamp("due_date"),
-    priority: priorityEnum("priority").default("medium"), // low, medium, high
+    priority: priorityEnum("priority").default("medium"), 
     status: statusEnum("status").default("todo"),
     position: integer("position").default(0).notNull(),
     createdAt: timestamp("created_at").defaultNow().notNull(),

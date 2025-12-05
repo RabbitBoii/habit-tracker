@@ -12,7 +12,7 @@ interface TaskCardProps {
     task: {
         id: number;
         title: string;
-        description: string | null; // 👈 Added Description
+        description: string | null;
         priority: string | null;
         status: string | null;
         projectId: number;
@@ -62,7 +62,7 @@ export function TaskCard({ task }: TaskCardProps) {
                         {task.title}
                     </div>
 
-                    {/* Description (Truncated to 2 lines to keep cards uniform) */}
+                    {/* Description */}
                     {task.description && (
                         <div className="text-sm text-muted-foreground mt-2 line-clamp-2 leading-snug">
                             {task.description}
@@ -71,13 +71,11 @@ export function TaskCard({ task }: TaskCardProps) {
 
                     {/* Priority Label */}
                     <div className="flex items-center justify-between mt-3 pt-2 ">
-                        {/* border-t border-border/50 */}
-                        {/* Priority (Bottom Left) */}
                         <div className={cn("text-xs uppercase flex items-center gap-1", getPriorityColor(task.priority))}>
                             {task.priority || "Normal"}
                         </div>
 
-                        {/* Status & Actions (Bottom Right) */}
+                        {/* Status & Actions */}
                         <div className="flex items-center gap-2">
                             <Badge
                                 variant={getBadgeVariant(task.status)}
@@ -92,7 +90,7 @@ export function TaskCard({ task }: TaskCardProps) {
 
                 {/* === RIGHT COLUMN: CONTROLS === */}
 
-                {/* Drag Handle (Top Right) */}
+                {/* Drag Handle */}
                 <div
                     {...attributes}
                     {...listeners}

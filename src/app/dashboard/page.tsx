@@ -7,7 +7,7 @@ import { ArrowRight, Folder } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 
 export default function DashboardPage() {
-    // 1. Fetch Projects
+    // Fetch Projects
     const { data: projects, isLoading } = trpc.project.getAll.useQuery();
 
     return (
@@ -21,13 +21,12 @@ export default function DashboardPage() {
                 <CreateProjectBtn />
             </div>
 
-            {/* STATS PLACEHOLDER (We will add the Ring Chart here next) */}
+            {/* STATS PLACEHOLDER */}
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 mb-8">
                 <div className="p-6 bg-white dark:bg-zinc-900 border rounded-xl shadow-sm">
                     <div className="text-sm font-medium text-gray-500">Total Projects</div>
                     <div className="text-2xl font-bold">{projects?.length || 0}</div>
                 </div>
-                {/* Add more stats later */}
             </div>
 
             {/* PROJECT GRID */}

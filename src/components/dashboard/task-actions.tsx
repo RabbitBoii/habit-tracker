@@ -30,7 +30,7 @@ interface TaskActionsProps {
     task: {
         id: number;
         title: string;
-        priority: "low" | "medium" | "high" | string | null; // looser type to match DB return
+        priority: "low" | "medium" | "high" | string | null; 
         status: "todo" | "in_progress" | "done" | string | null;
         projectId: number;
         description: string | null;
@@ -44,7 +44,7 @@ export default function TaskActions({ task }: TaskActionsProps) {
 
     const utils = trpc.useUtils();
 
-    // 1. DELETE MUTATION
+    // DELETE MUTATION
     const deleteTask = trpc.task.delete.useMutation({
         onSuccess: () => {
             toast.success("Task deleted");
@@ -52,12 +52,12 @@ export default function TaskActions({ task }: TaskActionsProps) {
         },
     });
 
-    // 2. UPDATE STATUS MUTATION
+    // UPDATE STATUS MUTATION
     const updateStatus = trpc.task.updateStatus.useMutation({
         onSuccess: () => utils.task.getByProject.invalidate({ projectId: task.projectId }),
     });
 
-    // 3. UPDATE PRIORITY MUTATION
+    // UPDATE PRIORITY MUTATION
     const updateTask = trpc.task.update.useMutation({
         onSuccess: () => {
             utils.task.getByProject.invalidate({ projectId: task.projectId });

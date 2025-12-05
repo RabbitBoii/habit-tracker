@@ -8,17 +8,17 @@ interface ProjectStatsProps {
 }
 
 export default function ProjectStats({ tasks }: ProjectStatsProps) {
-    // 1. Calculate Counts
+    // Calculate Counts
     const total = tasks.length;
     const done = tasks.filter((t) => t.status === "done").length;
     const inProgress = tasks.filter((t) => t.status === "in_progress").length;
     const todo = tasks.filter((t) => !t.status || t.status === "todo").length;
 
-    // 2. Prepare Data for Chart
+    // Prepare Data for Chart
     const data = [
-        { name: "Done", value: done, color: "#22c55e" },       // Green
-        { name: "In Progress", value: inProgress, color: "#3b82f6" }, // Blue
-        { name: "To Do", value: todo, color: "#e5e7eb" },      // Gray
+        { name: "Done", value: done, color: "#22c55e" },
+        { name: "In Progress", value: inProgress, color: "#3b82f6" },
+        { name: "To Do", value: todo, color: "#e5e7eb" },
     ];
 
     // Prevent division by zero

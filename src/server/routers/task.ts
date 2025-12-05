@@ -5,17 +5,17 @@ import { eq, and, asc, desc } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
 
 export const taskRouter = router({
-    // 1. GET TASKS BY PROJECT
+    // GET TASKS BY PROJECT
     getByProject: protectedProcedure
         .input(z.object({ projectId: z.number() }))
         .query(async ({ ctx, input }) => {
             return await ctx.db.query.tasks.findMany({
                 where: eq(tasks.projectId, input.projectId),
-                orderBy: [asc(tasks.position)], // Order by position for Drag-n-Drop!
+                orderBy: [asc(tasks.position)], 
             });
         }),
 
-    // 2. CREATE MANUAL TASK
+    // CREATE MANUAL TASK
     create: protectedProcedure
         .input(z.object({
             projectId: z.number(),
@@ -57,7 +57,6 @@ export const taskRouter = router({
             });
             if (!user) throw new TRPCError({ code: "UNAUTHORIZED" });
 
-            // We use 'and()' to ensure we only delete if it belongs to THIS user
             const deleted = await ctx.db.delete(tasks)
                 .where(and(
                     eq(tasks.id, input.taskId),
@@ -105,7 +104,7 @@ export const taskRouter = router({
     saveOrder: protectedProcedure
         .input(z.object({
             projectId: z.number(),
-            newOrder: z.array(z.number()) // Array of Task IDs in the new order
+            newOrder: z.array(z.number())
         }))
         .mutation(async ({ ctx, input }) => {
             const user = await ctx.db.query.users.findFirst({
@@ -113,8 +112,6 @@ export const taskRouter = router({
             });
             if (!user) throw new TRPCError({ code: "UNAUTHORIZED" });
 
-            // We use a Transaction to ensure all updates happen, or none do.
-            // This prevents the list from getting corrupted if the internet cuts out.
             const updates = input.newOrder.map((taskId, index) => {
                 return ctx.db.update(tasks)
                     .set({ position: index })

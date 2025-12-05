@@ -1,4 +1,6 @@
 import { createTRPCReact } from "@trpc/react-query";
-import { type AppRouter } from "@/server"; // 👈 We only import the TYPE, not the code
+import { type AppRouter } from "@/server";
+
+// 
 
 export const trpc = createTRPCReact<AppRouter>();

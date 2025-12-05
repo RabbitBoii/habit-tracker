@@ -1,11 +1,11 @@
 import { router } from "./trpc";
 import { projectRouter } from "./routers/project";
-import { userRouter } from "./routers/user"; // <--- Import this
+import { userRouter } from "./routers/user";
 import { taskRouter } from "./routers/task";
 import { aiRouter } from "./routers/ai";
 
 export const appRouter = router({
-  user: userRouter, // <--- Add this
+  user: userRouter, 
   project: projectRouter,
   task: taskRouter,
   ai: aiRouter,
