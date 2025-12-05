@@ -6,7 +6,7 @@ Stop planning and start doing. HabitAI uses **Llama 3.3** to break down your amb
 ### [🔴 Live Demo](https://habit-tracker-rabbitboii-42.vercel.app/)
 
 ![Landing Page](./public/Screenshot_landing.png)
-[Dashboard](./public/Screenshot_dashboard.png)
+![Dashboard](./public/Screenshot_dashboard.png)
 
 ## ✨ Key Features
 
